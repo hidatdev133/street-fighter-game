@@ -1,5 +1,6 @@
 import pygame
 from fighter import Fighter
+import random
 
 pygame.init()
 
@@ -46,6 +47,47 @@ sword_fx.set_volume(0.5)
 magic_fx = pygame.mixer.Sound("assets/audio/magic.wav")
 magic_fx.set_volume(0.75)
 
+
+# Hàm vẽ văn bản
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
+
+# Font
+count_font = pygame.font.Font("assets/fonts/turok.ttf", 80)
+score_font = pygame.font.Font("assets/fonts/turok.ttf", 30)
+
+# Chọn chế độ chơi trước khi chọn background
+def select_mode():
+    global selected_mode
+    selected_mode = None
+    draw_text("Select Mode", count_font, RED, SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 3)
+    draw_text("1 - Player vs Player", score_font, RED, SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2)
+    draw_text("2 - Player vs Computer", score_font, RED, SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2 + 50)
+    pygame.display.update()
+    selected = False
+    while not selected:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    selected_mode = "player_vs_player"
+                    selected = True
+                elif event.key == pygame.K_2:
+                    selected_mode = "player_vs_computer"
+                    selected = True
+                  
+
+# Chọn chế độ chơi
+select_mode()
+
+# Hàm chọn hành động của nhân vật thứ hai (NPC)
+def select_npc_action():
+    actions = ["UP", "LEFT", "RIGHT", "ATTACK"]
+    return random.choice(actions)
+
 # Biến hình nền
 backgrounds = ["assets/images/background/background01.jpg",
                "assets/images/background/background02.jpg"]
@@ -63,17 +105,6 @@ victory_img = pygame.image.load("assets/images/icons/victory.png").convert_alpha
 # Số bước trong mỗi animation
 WARRIOR_ANIMATION_STEPS = [10, 8, 1, 7, 7, 3, 7]
 WIZARD_ANIMATION_STEPS = [8, 8, 1, 8, 8, 3, 7]
-
-# Font
-count_font = pygame.font.Font("assets/fonts/turok.ttf", 80)
-score_font = pygame.font.Font("assets/fonts/turok.ttf", 30)
-
-
-# Hàm vẽ văn bản
-def draw_text(text, font, text_col, x, y):
-    img = font.render(text, True, text_col)
-    screen.blit(img, (x, y))
-
 
 # Hàm vẽ background
 def draw_bg():
@@ -135,6 +166,7 @@ def select_background():
 
 selected_background = select_background()
 bg_image = bg_images[selected_background]
+
 # Game loop
 time_remaining = 63  # Thời gian ban đầu
 while True:
@@ -157,9 +189,21 @@ while True:
 
     # Cập nhật countdown
     if intro_count <= 0:
-        # Di chuyển nhân vật
         fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_2, round_over)
-        fighter_2.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
+        if selected_mode == "player_vs_player":
+            fighter_2.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
+        elif selected_mode == "player_vs_computer":
+            npc_action = select_npc_action()
+            # Xử lý hành động của NPC
+            # if npc_action == "UP":
+            #     fighter_2.move_up(SCREEN_WIDTH, SCREEN_HEIGHT)
+            if fighter_1.alive:
+                if npc_action == "LEFT":
+                    fighter_2.move_left(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
+                elif npc_action == "RIGHT":
+                    fighter_2.move_right(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
+                elif npc_action == "ATTACK":
+                    fighter_2.npc_attack(60, fighter_1)
     else:
         # Hiển thị đồng hồ đếm
         draw_text(str(intro_count), count_font, RED, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3)
