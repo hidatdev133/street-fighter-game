@@ -228,7 +228,7 @@ class Fighter():
                         self.attack_type = 1
                     if key[pygame.K_t]:
                         self.attack_type = 2
-            
+
 
             #check player2 controls
             if self.player == 2:
@@ -348,6 +348,11 @@ class Fighter():
                     self.attacking = False
                     self.attack_cooldown = 20
                 #nếu nhân vật đã nhận sát thương
+                #check if an attack was executed
+                if self.action == 3 or self.action == 4:
+                    self.attacking = False
+                    self.attack_cooldown = 20
+                #check if damage was taken
                 if self.action == 5:
                     self.hit = False
                     #nếu người chơi đang ở giữa một cuộc tấn công thì cuộc tấn công sẽ dừng lại
@@ -368,7 +373,7 @@ class Fighter():
             if attacking_rect.colliderect(target.rect):
                 target.health -= 10
                 target.hit = True
-          
+
     def update_action(self, new_action):
         #kiểm tra xem hành động mới có khác với hành động trước không
         if new_action != self.action:
@@ -386,3 +391,5 @@ class Fighter():
         # img là hình ảnh của nhân vật đã được lật nếu cần.
         # (self.rect.x - (self.offset[0] * self.image_scale), self.rect.y - (self.offset[1] * self.image_scale)) là tọa độ (x, y) của hình ảnh trên bề mặt. Tọa độ này được tính dựa trên tọa độ của hình chữ nhật giới hạn của nhân vật (self.rect), và được điều chỉnh bởi offset và tỉ lệ hình ảnh (self.image_scale).
         surface.blit(img, (self.rect.x - (self.offset[0] * self.image_scale), self.rect.y - (self.offset[1] * self.image_scale)))
+        surface.blit(img, (self.rect.x - (self.offset[0] * self.image_scale), self.rect.y - (self.offset[1] * self.image_scale)))
+
