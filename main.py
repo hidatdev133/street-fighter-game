@@ -66,14 +66,6 @@ LANCER_DATA = [LANCER_SIZE, LANCER_SCALE, LANCER_OFFSET]
 LANCER_ANIMATION_STEPS = [8, 8, 2, 5, 5, 3, 8]
 lancer_sheet = pygame.image.load("assets/images/lancer/Sprites/lancer.png").convert_alpha()
 
-# -----------------------------------------------------------
-#witch
-WITCH_SIZE = 150
-WITCH_SCALE = 3
-WITCH_OFFSET = [112, 107]
-WITCH_DATA = [WITCH_SIZE, WITCH_SCALE, WITCH_OFFSET]
-WITCH_ANIMATION_STEPS = [6, 8, 2, 8, 8, 4, 7]
-witch_sheet = pygame.image.load("assets/images/witch/Sprites/witch.png").convert_alpha()
 
 # Âm nhạc và âm thanh
 pygame.mixer.init()
@@ -184,7 +176,6 @@ def select_fighter_1():
     draw_text("Player 1: Select your fighter", score_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 3)
     draw_text("Press '1' for Warrior or '2' for Wizard", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 + 50)
     draw_text("Press '3' for Samurai or '4' for Lancer", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 + 100)
-    draw_text("Press '5' for Witch", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 + 150)
     pygame.display.update()
     selected = False
     while not selected:
@@ -204,9 +195,7 @@ def select_fighter_1():
                 elif event.key == pygame.K_4:
                     selected_fighter_1 = 4  # Chọn nhân vật Lancer
                     selected = True
-                elif event.key == pygame.K_5:
-                    selected_fighter_1 = 5  # Chọn nhân vật Witch
-                    selected = True
+         
 
 # Hàm chọn nhân vật của người chơi 2
 def select_fighter_2():
@@ -216,7 +205,7 @@ def select_fighter_2():
     draw_text("Player 2: Select your fighter", score_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 3)
     draw_text("Press '1' for Warrior or '2' for Wizard", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 + 50)
     draw_text("Press '3' for Samurai or '4' for Lancer", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 + 100)
-    draw_text("Press '5' for Witch", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 + 150)
+
     pygame.display.update()
     selected = False
     while not selected:
@@ -236,10 +225,7 @@ def select_fighter_2():
                 elif event.key == pygame.K_4:
                     selected_fighter_2 = 4  # Chọn nhân vật Lancer
                     selected = True
-                elif event.key == pygame.K_5:
-                    selected_fighter_2 = 5  # Chọn nhân vật Witch
-                    selected = True
-
+            
 select_fighter_1()
 select_fighter_2()
 
@@ -287,8 +273,7 @@ elif selected_fighter_1 == 3:
     fighter_1 = Fighter(1, 200, 310, False, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, sword_fx)
 elif selected_fighter_1 == 4:
     fighter_1 = Fighter(1, 200, 310, False, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, sword_fx)
-elif selected_fighter_1 == 5:
-    fighter_1 = Fighter(1, 200, 310, False, WITCH_DATA, witch_sheet, WITCH_ANIMATION_STEPS, magic_fx) 
+
 
 # Tạo nhân vật cho người chơi 2
 if selected_fighter_2 == 1:
@@ -299,8 +284,7 @@ elif selected_fighter_2 == 3:
     fighter_2 = Fighter(2, 700, 310, False, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, sword_fx)
 elif selected_fighter_2 == 4:
     fighter_2 = Fighter(2, 700, 310, False, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, sword_fx)
-elif selected_fighter_2 == 5:
-    fighter_2 = Fighter(2, 700, 310, False, WITCH_DATA, witch_sheet, WITCH_ANIMATION_STEPS, magic_fx) 
+
 
 
 # Game loop
@@ -415,13 +399,10 @@ while True:
             elif select_fighter_1 == 3:
                 fighter_1 = Fighter(1, 200, 310, False, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, 
                                     sword_fx)
-            elif select_fighter_1 == 3:
+            elif select_fighter_1 == 4:
                 fighter_1 = Fighter(1, 200, 310, False, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, 
                                     sword_fx)
-            elif select_fighter_1 == 3:
-                fighter_1 = Fighter(1, 200, 310, False, WITCH_DATA, witch_sheet, WITCH_ANIMATION_STEPS, 
-                                    magic_fx)
-                
+           
 
             if selected_fighter_2 == 1:
                 fighter_2 = Fighter(2, 700, 310, True, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS,
@@ -435,10 +416,7 @@ while True:
             elif select_fighter_2 == 4:
                 fighter_1 = Fighter(2, 700, 310, False, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, 
                                     sword_fx)
-            elif select_fighter_2 == 5:
-                fighter_1 = Fighter(2, 700, 310, False, WITCH_DATA, witch_sheet, WITCH_ANIMATION_STEPS, 
-                                    magic_fx)    
-
+            
 
     # Xử lý sự kiện
     for event in pygame.event.get():
