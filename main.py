@@ -52,7 +52,7 @@ wizard_sheet = pygame.image.load("assets/images/wizard/Sprites/wizard.png").conv
 #samurai
 SAMURAI_SIZE = 200
 SAMURAI_SCALE = 3.5
-SAMURAI_OFFSET = [90, 78]
+SAMURAI_OFFSET = [90, 75]
 SAMURAI_DATA = [SAMURAI_SIZE, SAMURAI_SCALE, SAMURAI_OFFSET]
 SAMURAI_ANIMATION_STEPS = [4, 8, 2, 4, 4, 3, 7]
 samurai_sheet = pygame.image.load("assets/images/samurai/Sprites/samurai.png").convert_alpha()
@@ -61,7 +61,7 @@ samurai_sheet = pygame.image.load("assets/images/samurai/Sprites/samurai.png").c
 #lancer
 LANCER_SIZE = 150
 LANCER_SCALE = 4.5
-LANCER_OFFSET = [67, 57]
+LANCER_OFFSET = [67, 54]
 LANCER_DATA = [LANCER_SIZE, LANCER_SCALE, LANCER_OFFSET]
 LANCER_ANIMATION_STEPS = [8, 8, 2, 5, 5, 3, 8]
 lancer_sheet = pygame.image.load("assets/images/lancer/Sprites/lancer.png").convert_alpha()
@@ -277,13 +277,13 @@ elif selected_fighter_1 == 4:
 
 # Tạo nhân vật cho người chơi 2
 if selected_fighter_2 == 1:
-    fighter_2 = Fighter(2, 700, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
+    fighter_2 = Fighter(2, 700, 310, True, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
 elif selected_fighter_2 == 2:
-    fighter_2 = Fighter(2, 700, 310, False, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
+    fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
 elif selected_fighter_2 == 3:
-    fighter_2 = Fighter(2, 700, 310, False, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, sword_fx)
+    fighter_2 = Fighter(2, 700, 310, True, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, sword_fx)
 elif selected_fighter_2 == 4:
-    fighter_2 = Fighter(2, 700, 310, False, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, sword_fx)
+    fighter_2 = Fighter(2, 700, 310, True, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, sword_fx)
 
 
 
@@ -361,29 +361,33 @@ while True:
                 time_remaining = 60
                 # Khởi tạo lại nhân vật
                 if selected_fighter_1 == 1:
-                    fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS,
-                                        sword_fx)
+                    fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
                 elif selected_fighter_1 == 2:
                     fighter_1 = Fighter(1, 200, 310, False, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
                 if selected_fighter_2 == 1:
-                    fighter_2 = Fighter(2, 700, 310, True, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS,
-                                        sword_fx)
+                    fighter_2 = Fighter(2, 700, 310, True, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
                 elif selected_fighter_2 == 2:
                     fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
 
     # Kiểm tra người chơi thua
     if round_over == False:
-        if fighter_1.alive == False:
+        if fighter_1.alive == False and fighter_2.alive == False:
+            round_over = True
+            round_over_time = pygame.time.get_ticks()
+        elif fighter_1.alive == False and fighter_2.alive == True:
             score[1] += 1
             round_over = True
             round_over_time = pygame.time.get_ticks()
-        elif fighter_2.alive == False:
+        elif fighter_2.alive == False and fighter_1.alive == True:
             score[0] += 1
             round_over = True
             round_over_time = pygame.time.get_ticks()
+            
     else:
-        # Hiển thị hình ảnh chiến thắng
-        screen.blit(victory_img, (360, 150))
+        if fighter_1.alive == False and fighter_2.alive == False:
+            # Hiển thị hình ảnh chiến thắng
+            screen.blit(drawn_img, (360, 150))
+        else: screen.blit(victory_img, (360, 150))
         if pygame.time.get_ticks() - round_over_time > ROUND_OVER_COOLDOWN:
             round_over = False
             intro_count = 3
@@ -391,32 +395,24 @@ while True:
             # Khởi tạo lại nhân vật
         
             if selected_fighter_1 == 1:
-                fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS,
-                                    sword_fx)
+                fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
             elif selected_fighter_1 == 2:
-                fighter_1 = Fighter(1, 200, 310, False, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, 
-                                    magic_fx)
-            elif select_fighter_1 == 3:
-                fighter_1 = Fighter(1, 200, 310, False, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, 
-                                    sword_fx)
-            elif select_fighter_1 == 4:
-                fighter_1 = Fighter(1, 200, 310, False, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, 
-                                    sword_fx)
-           
+                fighter_1 = Fighter(1, 200, 310, False, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
+            elif selected_fighter_1 == 3:
+                fighter_1 = Fighter(1, 200, 310, False, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, sword_fx)
+            elif selected_fighter_1 == 4:
+                fighter_1 = Fighter(1, 200, 310, False, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, sword_fx)
 
             if selected_fighter_2 == 1:
-                fighter_2 = Fighter(2, 700, 310, True, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS,
-                                    sword_fx)
+                fighter_2 = Fighter(2, 700, 310, True, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
             elif selected_fighter_2 == 2:
-                fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, 
-                                    magic_fx)
-            elif select_fighter_2 == 3:
-                fighter_1 = Fighter(2, 700, 310, False, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, 
-                                    sword_fx)
-            elif select_fighter_2 == 4:
-                fighter_1 = Fighter(2, 700, 310, False, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, 
-                                    sword_fx)
+                fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
+            elif selected_fighter_2 == 3:
+                fighter_2 = Fighter(2, 700, 310, True, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, sword_fx)
+            elif selected_fighter_2 == 4:
+                fighter_2 = Fighter(2, 700, 310, True, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, sword_fx)
             
+
 
     # Xử lý sự kiện
     for event in pygame.event.get():
