@@ -95,9 +95,9 @@ score_font = pygame.font.Font("assets/fonts/turok.ttf", 30)
 def select_mode():
     global selected_mode
     selected_mode = None
-    draw_text("Select Mode", count_font, RED, SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 3)
-    draw_text("1 - Player vs Player", score_font, RED, SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2)
-    draw_text("2 - Player vs Computer", score_font, RED, SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2 + 50)
+    draw_text("Select Mode", count_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 3)
+    draw_text("1 - Player vs Player", score_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2)
+    draw_text("2 - Player vs Computer", score_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 50)
     pygame.display.update()
     selected = False
     while not selected:
@@ -235,9 +235,9 @@ def select_background():
     selected_background = 0
     bg_image = pygame.transform.scale(bg_images[selected_background], (SCREEN_WIDTH, SCREEN_HEIGHT))
     screen.blit(bg_image, (0, 0))
-    draw_text("Select Background", count_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 3)
+    draw_text("Select Background", count_font, RED, SCREEN_WIDTH / 2 - 330, SCREEN_HEIGHT / 3)
     draw_text("Press LEFT/RIGHT arrow keys to select", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2)
-    draw_text("Press ENTER to start", score_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 50)
+    draw_text("Press ENTER to start", score_font, RED, SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2 + 50)
     pygame.display.update()
     selected = False
     while not selected:
@@ -249,11 +249,17 @@ def select_background():
                     selected_background = (selected_background - 1) % len(bg_images)
                     bg_image = pygame.transform.scale(bg_images[selected_background], (SCREEN_WIDTH, SCREEN_HEIGHT))
                     screen.blit(bg_image, (0, 0))
+                    draw_text("Select Background", count_font, RED, SCREEN_WIDTH / 2 - 330, SCREEN_HEIGHT / 3)
+                    draw_text("Press LEFT/RIGHT arrow keys to select", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2)
+                    draw_text("Press ENTER to start", score_font, RED, SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2 + 50)
                     pygame.display.update()
                 elif event.key == pygame.K_RIGHT:
                     selected_background = (selected_background + 1) % len(bg_images)
                     bg_image = pygame.transform.scale(bg_images[selected_background], (SCREEN_WIDTH, SCREEN_HEIGHT))
                     screen.blit(bg_image, (0, 0))
+                    draw_text("Select Background", count_font, RED, SCREEN_WIDTH / 2 - 330, SCREEN_HEIGHT / 3)
+                    draw_text("Press LEFT/RIGHT arrow keys to select", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2)
+                    draw_text("Press ENTER to start", score_font, RED, SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2 + 50)
                     pygame.display.update()
                 elif event.key == pygame.K_RETURN:
                     selected = True
@@ -364,10 +370,19 @@ while True:
                     fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
                 elif selected_fighter_1 == 2:
                     fighter_1 = Fighter(1, 200, 310, False, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
+                elif selected_fighter_1 == 3:
+                    fighter_1 = Fighter(1, 200, 310, False, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, sword_fx)
+                elif selected_fighter_1 == 4:
+                    fighter_1 = Fighter(1, 200, 310, False, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, sword_fx)
+
                 if selected_fighter_2 == 1:
                     fighter_2 = Fighter(2, 700, 310, True, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
                 elif selected_fighter_2 == 2:
                     fighter_2 = Fighter(2, 700, 310, True, WIZARD_DATA, wizard_sheet, WIZARD_ANIMATION_STEPS, magic_fx)
+                elif selected_fighter_2 == 3:
+                    fighter_2 = Fighter(2, 700, 310, True, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, sword_fx)
+                elif selected_fighter_2 == 4:
+                    fighter_2 = Fighter(2, 700, 310, True, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, sword_fx)
 
     # Kiểm tra người chơi thua
     if round_over == False:
