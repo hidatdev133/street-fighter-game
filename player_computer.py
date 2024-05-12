@@ -1,8 +1,20 @@
 import pygame
-from fighter1 import Fighter
+from fighter import Fighter
 import random
 import socket
 pygame.init()
+import socket
+
+# Tạo socket client
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect(('localhost', 8000))  # Kết nối với server
+
+# Nhận dữ liệu từ server (nếu có)
+data = client_socket.recv(1024)
+print(f"Nhận dữ liệu từ server: {data.decode()}")
+
+# Đóng kết nối
+client_socket.close()
 
 # Thiết lập cửa sổ
 SCREEN_WIDTH = 1000
@@ -91,42 +103,7 @@ def draw_text(text, font, text_col, x, y):
 count_font = pygame.font.Font("assets/fonts/turok.ttf", 80)
 score_font = pygame.font.Font("assets/fonts/turok.ttf", 30)
 
-def create_server():
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('localhost', 5555))  # Đặt port là 5555, bạn có thể chọn một port khác
-    server_socket.listen(1)
-    print("Waiting for player 2 to connect...")
-    client_socket, address = server_socket.accept()
-    print("Player 2 connected!")
-    return client_socket
 
-
-    
-# Chọn chế độ chơi trước khi chọn background
-def select_mode():
-    global selected_mode
-    selected_mode = None
-    draw_text("Select Mode", count_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 3)
-    draw_text("1 - Player vs Player", score_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2)
-    draw_text("2 - Player vs Computer", score_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 50)
-    pygame.display.update()
-    selected = False
-    while not selected:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1:
-                    selected_mode = "player_vs_player"
-                    server_socket = create_server()  # Tạo máy chủ
-                    selected = True
-                elif event.key == pygame.K_2:
-                    selected_mode = "player_vs_computer"
-                    selected = True
-                  
-# Chọn chế độ chơi
-select_mode()
 
 # Hàm chọn hành động của nhân vật thứ hai (NPC)
 def select_npc_action():
@@ -179,6 +156,16 @@ def draw_timer(time_remaining):
 # Biến lựa chọn nhân vật của người chơi 1
 selected_fighter_1 = None
 selected_fighter_2 = None
+
+def create_server():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind(('localhost', 5555))  # Đặt port là 5555, bạn có thể chọn một port khác
+    server_socket.listen(1)
+    print("Waiting for player 2 to connect...")
+    client_socket, address = server_socket.accept()
+    print("Player 2 connected!")
+    return client_socket
+
 
 # Hàm chọn nhân vật của người chơi 1
 def select_fighter_1():
@@ -327,17 +314,14 @@ while True:
         time_remaining -= 1 / FPS
         # Di chuyển nhân vật
         fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_2, round_over)
-        if selected_mode == "player_vs_player":
-            fighter_2.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
-        elif selected_mode == "player_vs_computer":
-            npc_action = select_npc_action()
-            if fighter_1.alive:
-                if npc_action == "LEFT":
-                    fighter_2.move_left(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
-                elif npc_action == "RIGHT":
-                    fighter_2.move_right(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
-                elif npc_action == "ATTACK":
-                    fighter_2.npc_attack(60, fighter_1)
+        npc_action = select_npc_action()
+        if fighter_1.alive:
+            if npc_action == "LEFT":
+                fighter_2.move_left(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
+            elif npc_action == "RIGHT":
+                fighter_2.move_right(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
+            elif npc_action == "ATTACK":
+                fighter_2.npc_attack(60, fighter_1)
     else:
         # Hiển thị đồng hồ đếm
         draw_text(str(intro_count), count_font, RED, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3)

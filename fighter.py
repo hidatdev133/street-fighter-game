@@ -382,6 +382,7 @@ class Fighter():
             self.frame_index = 0
             self.update_time = pygame.time.get_ticks()
 
+    
     # vẽ nhân vật lên một bề mặt cụ thể (surface), chẳng hạn như màn hình trò chơi.
     def draw(self, surface):
         # self.image là hình ảnh của nhân vật.

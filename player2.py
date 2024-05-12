@@ -1,8 +1,19 @@
 import pygame
-from fighter1 import Fighter
+from fighter import Fighter
 import random
 import socket
 pygame.init()
+
+# Tạo socket client
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect(('localhost', 8000))  # Kết nối với server
+
+# Nhận dữ liệu từ server (nếu có)
+data = client_socket.recv(1024)
+print(f"Nhận dữ liệu từ server: {data.decode()}")
+
+# Đóng kết nối
+client_socket.close()
 
 # Thiết lập cửa sổ
 SCREEN_WIDTH = 1000
@@ -81,57 +92,22 @@ sword_fx.set_volume(0.5)
 magic_fx = pygame.mixer.Sound("assets/audio/magic.wav")
 magic_fx.set_volume(0.75)
 
+# Font
+count_font = pygame.font.Font("assets/fonts/turok.ttf", 80)
+score_font = pygame.font.Font("assets/fonts/turok.ttf", 30)
 
 # Hàm vẽ văn bản
 def draw_text(text, font, text_col, x, y):
     img = font.render(text, True, text_col)
     screen.blit(img, (x, y))
 
-# Font
-count_font = pygame.font.Font("assets/fonts/turok.ttf", 80)
-score_font = pygame.font.Font("assets/fonts/turok.ttf", 30)
-
-def create_server():
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('localhost', 5555))  # Đặt port là 5555, bạn có thể chọn một port khác
-    server_socket.listen(1)
-    print("Waiting for player 2 to connect...")
-    client_socket, address = server_socket.accept()
-    print("Player 2 connected!")
-    return client_socket
+def connect_to_client1():
+    client1_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client1_socket.connect(('localhost', 5555))  # Kết nối với client 1
+    print("Connected to player 1!")
+    return client1_socket
 
 
-    
-# Chọn chế độ chơi trước khi chọn background
-def select_mode():
-    global selected_mode
-    selected_mode = None
-    draw_text("Select Mode", count_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 3)
-    draw_text("1 - Player vs Player", score_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2)
-    draw_text("2 - Player vs Computer", score_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 + 50)
-    pygame.display.update()
-    selected = False
-    while not selected:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1:
-                    selected_mode = "player_vs_player"
-                    server_socket = create_server()  # Tạo máy chủ
-                    selected = True
-                elif event.key == pygame.K_2:
-                    selected_mode = "player_vs_computer"
-                    selected = True
-                  
-# Chọn chế độ chơi
-select_mode()
-
-# Hàm chọn hành động của nhân vật thứ hai (NPC)
-def select_npc_action():
-    actions = ["LEFT", "RIGHT", "ATTACK"]
-    return random.choice(actions)
 
 
 # Biến hình nền
@@ -180,33 +156,6 @@ def draw_timer(time_remaining):
 selected_fighter_1 = None
 selected_fighter_2 = None
 
-# Hàm chọn nhân vật của người chơi 1
-def select_fighter_1():
-    screen.fill((0, 0, 0))  # Xóa màn hình bằng màu đen
-    pygame.display.update()  # Cập nhật màn hình
-    global selected_fighter_1
-    draw_text("Player 1: Select your fighter", score_font, RED, SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 3)
-    draw_text("Press '1' for Warrior or '2' for Wizard", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 + 50)
-    draw_text("Press '3' for Samurai or '4' for Lancer", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 + 100)
-    pygame.display.update()
-    selected = False
-    while not selected:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1:
-                    selected_fighter_1 = 1  # Chọn nhân vật Warrior
-                    selected = True
-                elif event.key == pygame.K_2:
-                    selected_fighter_1 = 2  # Chọn nhân vật Wizard
-                    selected = True
-                elif event.key == pygame.K_3:
-                    selected_fighter_1 = 3  # Chọn nhân vật Samurai
-                    selected = True
-                elif event.key == pygame.K_4:
-                    selected_fighter_1 = 4  # Chọn nhân vật Lancer
-                    selected = True
          
 
 # Hàm chọn nhân vật của người chơi 2
@@ -237,51 +186,20 @@ def select_fighter_2(server_socket=None):
                 elif event.key == pygame.K_4:
                     selected_fighter_2 = 4  # Chọn nhân vật Lancer
                     selected = True
-            
-select_fighter_1()
+
+        
 select_fighter_2()
+# Kết nối với client 1
+client1_socket = connect_to_client1()
 
-# Chọn background
-def select_background():
-    global selected_background, bg_image
-    selected_background = 0
-    bg_image = pygame.transform.scale(bg_images[selected_background], (SCREEN_WIDTH, SCREEN_HEIGHT))
-    screen.blit(bg_image, (0, 0))
-    draw_text("Select Background", count_font, RED, SCREEN_WIDTH / 2 - 330, SCREEN_HEIGHT / 3)
-    draw_text("Press LEFT/RIGHT arrow keys to select", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2)
-    draw_text("Press ENTER to start", score_font, RED, SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2 + 50)
-    pygame.display.update()
-    selected = False
-    while not selected:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    selected_background = (selected_background - 1) % len(bg_images)
-                    bg_image = pygame.transform.scale(bg_images[selected_background], (SCREEN_WIDTH, SCREEN_HEIGHT))
-                    screen.blit(bg_image, (0, 0))
-                    draw_text("Select Background", count_font, RED, SCREEN_WIDTH / 2 - 330, SCREEN_HEIGHT / 3)
-                    draw_text("Press LEFT/RIGHT arrow keys to select", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2)
-                    draw_text("Press ENTER to start", score_font, RED, SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2 + 50)
-                    pygame.display.update()
-                elif event.key == pygame.K_RIGHT:
-                    selected_background = (selected_background + 1) % len(bg_images)
-                    bg_image = pygame.transform.scale(bg_images[selected_background], (SCREEN_WIDTH, SCREEN_HEIGHT))
-                    screen.blit(bg_image, (0, 0))
-                    draw_text("Select Background", count_font, RED, SCREEN_WIDTH / 2 - 330, SCREEN_HEIGHT / 3)
-                    draw_text("Press LEFT/RIGHT arrow keys to select", score_font, RED, SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2)
-                    draw_text("Press ENTER to start", score_font, RED, SCREEN_WIDTH / 2 - 150, SCREEN_HEIGHT / 2 + 50)
-                    pygame.display.update()
-                elif event.key == pygame.K_RETURN:
-                    selected = True
-    return selected_background
+# Nhận thông tin về background đã chọn từ client 1
+selected_background = int(client1_socket.recv(1024).decode())
 
-# Chọn background và nhân vật của người chơi 1 và người chơi 2
-selected_background = select_background()
-bg_image = bg_images[selected_background]
+# Cập nhật biến bg_image dựa trên background đã chọn
+bg_image = pygame.transform.scale(bg_images[selected_background], (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 
+selected_fighter_1 = int(client1_socket.recv(1024).decode())
 # Tạo nhân vật cho người chơi 1
 if selected_fighter_1 == 1:
     fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
@@ -302,6 +220,8 @@ elif selected_fighter_2 == 3:
     fighter_2 = Fighter(2, 700, 310, True, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, sword_fx)
 elif selected_fighter_2 == 4:
     fighter_2 = Fighter(2, 700, 310, True, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, sword_fx)
+client1_socket.send(str(selected_fighter_2).encode())
+
 
 
 
@@ -326,18 +246,9 @@ while True:
     if intro_count <= 0:
         time_remaining -= 1 / FPS
         # Di chuyển nhân vật
-        fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_2, round_over)
-        if selected_mode == "player_vs_player":
-            fighter_2.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
-        elif selected_mode == "player_vs_computer":
-            npc_action = select_npc_action()
-            if fighter_1.alive:
-                if npc_action == "LEFT":
-                    fighter_2.move_left(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
-                elif npc_action == "RIGHT":
-                    fighter_2.move_right(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
-                elif npc_action == "ATTACK":
-                    fighter_2.npc_attack(60, fighter_1)
+        fighter_1.move_data = client1_socket.recv(1024).decode()
+        fighter_2.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
+        
     else:
         # Hiển thị đồng hồ đếm
         draw_text(str(intro_count), count_font, RED, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3)
