@@ -1,5 +1,5 @@
 import pygame
-from fighter1 import Fighter
+from fighter import Fighter
 import random
 import socket
 pygame.init()
@@ -338,6 +338,14 @@ while True:
                     fighter_2.move_right(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_1, round_over)
                 elif npc_action == "ATTACK":
                     fighter_2.npc_attack(60, fighter_1)
+            #     if fighter_2.alive == False:
+            #         fighter_2.move_left = False
+            #         fighter_2.move_right = False
+            #         fighter_2.npc_attack = False
+            # elif fighter_1.alive == False:
+            #     fighter_2.move_left = False
+            #     fighter_2.move_right = False
+            #     fighter_2.npc_attack = False
     else:
         # Hiển thị đồng hồ đếm
         draw_text(str(intro_count), count_font, RED, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3)

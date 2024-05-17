@@ -70,8 +70,10 @@ class Fighter():
             animation_list.append(temp_img_list)
         return animation_list
 
-
     def move_left(self, screen_width, screen_height, surface, target, round_over):
+        if not self.alive:
+            return 
+        
         SPEED = 10
         dx = -SPEED
 
@@ -110,7 +112,18 @@ class Fighter():
         #cập nhật vị trí người chơi
         self.rect.x += dx
 
+        # if self.running:
+        #     if self.flip:
+        #         return "RUNNING_LEFT"
+        #     else:
+        #         return "RUNNING_RIGHT"
+        # else:
+        #     return "IDLE"
+
     def move_right(self, screen_width, screen_height, surface, target, round_over):
+        if not self.alive:
+            return 
+        
         SPEED = 10
         dx = SPEED
 
@@ -147,6 +160,9 @@ class Fighter():
         #cập nhật vị trí người chơi
         self.rect.x += dx   
 
+     
+      
+
     # def move_up(self, screen_width, screen_height, screen, round_over):
     #     GRAVITY = 2
     #     dy = 0
@@ -166,6 +182,9 @@ class Fighter():
     #         self.rect.y += dy
         
     def npc_attack(self, attack_cooldown_max, target):
+        if not self.alive:
+            return 
+        
         self.attack_cooldown_max = 60
         
         # Kiểm tra xem nhân vật của máy tính có đang ở gần đối tượng mục tiêu hay không
@@ -190,9 +209,20 @@ class Fighter():
             else:
                 # Giảm thời gian cooldown đi 1 trong mỗi vòng lặp
                 self.attack_cooldown -= 1
+       
+    def get_state(self):
+        return {
+        'rect': self.rect,
+        'action': self.action,
+        'health': self.health,
+        'alive': self.alive,
+        }
 
 
     def move(self, screen_width, screen_height, surface, target, round_over):
+        if not self.alive:
+            return
+        
         SPEED = 10
         GRAVITY = 2
         dx = 0
@@ -291,6 +321,16 @@ class Fighter():
         #cập nhật vị trí người chơi
         self.rect.x += dx
         self.rect.y += dy
+
+        # trả về trạng thái hoặc hành động của nhân vật
+        if self.running:
+            return "RUNNING_LEFT" if self.flip else "RUNNING_RIGHT"
+        elif self.jump:
+            return "JUMPING"
+        elif self.attacking:
+            return f"ATTACKING_{self.attack_type}"
+        else:
+            return "IDLE"
 
     #xử lý cập nhật hoạt ảnh
     def update(self):
