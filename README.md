@@ -36,29 +36,29 @@ Enjoy 😎
 ## 4. Mode:
 * Player vs Player
   - Move:
-    .Player1:
+  *Player1:
       + Left: A
       + Right: D
       + Up: W
-    .Player2:
+  *Player2:
       + Left: left
       + Right: right
       + Up: up
   - Attack:
-    .Player1:
+  *Player1:
       + Attack1: R
       + Attack2: T
-    .Player2:
+  *Player2:
       + Attack1: J
       + Attack2: K
 * Player vs Computer
   - Move:
-    Player1:
+  *Player1:
       + Left: A
       + Right: D
       + Up: W
   - Attack:
-    Player1:
+  *Player1:
       + Attack1: R
       + Attack2: T
 ## 5. Screen Recording:
