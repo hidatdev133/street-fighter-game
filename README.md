@@ -33,13 +33,34 @@ https://github.com/hidatdev133/street-fighter-game.git
 Enjoy 😎
 
 
-## 4. Contributing:
-
-Pull requests are welcome. 
-
-For major changes, please open an issue first to discuss what you would like to change with project owner (Coding With Russ).
-
-
+## 4. Mode:
+* Player vs Player
+  - Move:
+    Player1:
+      + Left: A
+      + Right: D
+      + Up: W
+    Player2:
+      + Left: left
+      + Right: right
+      + Up: up
+  - Attack:
+    Player1:
+      + Attack1: R
+      + Attack2: T
+    Player2:
+      + Attack1: J
+      + Attack2: K
+* Player vs Computer
+  - Move:
+    Player1:
+      + Left: A
+      + Right: D
+      + Up: W
+  - Attack:
+    Player1:
+      + Attack1: R
+      + Attack2: T
 ## 5. Screen Recording:
 
 https://user-images.githubusercontent.com/15172744/190894691-c52ac22d-b76c-4890-9057-98eed66683a9.mp4
