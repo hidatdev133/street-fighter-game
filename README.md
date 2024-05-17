@@ -19,7 +19,7 @@ URL: [https://www.pygame.org/news ](https://www.pygame.org/news)
 1. Clone the git repo
 
 ```
-https://github.com/russs123/brawler_tut.git
+(https://github.com/hidatdev133/street-fighter-game)
 ```
 
 2. Open project folder
