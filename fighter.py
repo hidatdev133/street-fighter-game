@@ -70,6 +70,7 @@ class Fighter():
             animation_list.append(temp_img_list)
         return animation_list
 
+
     def move_left(self, screen_width, screen_height, surface, target, round_over):
         if not self.alive:
             return 
@@ -210,13 +211,7 @@ class Fighter():
                 # Giảm thời gian cooldown đi 1 trong mỗi vòng lặp
                 self.attack_cooldown -= 1
        
-    def get_state(self):
-        return {
-        'rect': self.rect,
-        'action': self.action,
-        'health': self.health,
-        'alive': self.alive,
-        }
+
 
 
     def move(self, screen_width, screen_height, surface, target, round_over):

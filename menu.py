@@ -47,6 +47,14 @@ def setup_server_connections():
 
     return player1_socket, player2_socket, server_socket
 
+def get_free_socket():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(('', 0))  # Gán cổng 0 để lấy cổng bất kỳ
+    addr = s.getsockname()
+    s.close()
+    return addr
+
+
 def select_mode():
     global selected_mode
     selected_mode = None
@@ -66,31 +74,16 @@ def select_mode():
                     selected = True
                     try:
                         player1_socket, player2_socket, server_socket = setup_server_connections()
-
-                        # -----------------------------------------------
-                        # Gửi tín hiệu cho player1.py để yêu cầu chọn nhân vật và background
-                        player1_socket.sendall(b'select_fighter_and_bg')
-
-                        # Nhận thông tin về lựa chọn của player1.py
-                        fighter1_info = player1_socket.recv(1024)
-                        background_info = player1_socket.recv(1024)
-
-                        # Gửi thông tin cho player2.py
-                        player2_socket.sendall(fighter1_info)
-                        player2_socket.sendall(background_info)
-                        # -----------------------------------------------
-                        
-                        # Nhận thông tin về lựa chọn của player2.py
-                        fighter2_info = player2_socket.recv(1024)
-                        # Gửi thông tin cho player1.py
-                        player1_socket.sendall(fighter2_info)
+                        # Lấy địa chỉ và cổng mới cho mỗi socket
+                        player1_addr = get_free_socket()
+                        player2_addr = get_free_socket()
 
                         # Gửi thông tin socket cho player1.py
-                        pickled_player1_socket = pickle.dumps(player1_socket)
+                        pickled_player1_socket = pickle.dumps(player1_addr)
                         player1_socket.sendall(pickled_player1_socket)
 
                         # Gửi thông tin socket cho player2.py
-                        pickled_player2_socket = pickle.dumps(player2_socket)
+                        pickled_player2_socket = pickle.dumps(player2_addr)
                         player2_socket.sendall(pickled_player2_socket)
 
                         # Đóng kết nối

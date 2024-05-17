@@ -138,37 +138,6 @@ def draw_timer(time_remaining):
 selected_fighter_1 = None
 selected_fighter_2 = None
 
-# Hàm để gửi dữ liệu
-def send_data(received_socket):
-    while True:
-        # move_data = fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_2, round_over)
-        fighter_state = fighter_1.get_state()
-        data = pickle.dumps(fighter_state)
-        try:
-            received_socket.sendall(data)
-        except socket.error as e:
-            print(f"Socket error (send): {e}")
-            break
-
-# Hàm để nhận dữ liệu
-def receive_data(received_socket):
-    while True:
-        try:
-            data = received_socket.recv(1024)
-            if data:
-                fighter_state = pickle.loads(data)
-                fighter_2.rect = fighter_state['rect']
-                fighter_2.action = fighter_state['action']
-                fighter_2.health = fighter_state['health']
-                fighter_2.alive = fighter_state['alive']
-                print(f"Data received: {fighter_state}")  # Thêm lệnh in để kiểm tra dữ liệu
-            else:
-                print("Connection closed by the other player.")
-                break
-        except socket.error as e:
-            print(f"Socket error (recv): {e}")
-            break
-
 # Tạo socket client
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect(('localhost', 8000))  # Kết nối với server
@@ -186,6 +155,9 @@ received_socket.bind(local_addr)
 # Nhận dữ liệu từ server (nếu có)
 data = client_socket.recv(1024)
 print(f"Nhận dữ liệu từ server: {data.decode()}")
+ 
+# Đóng kết nối
+client_socket.close()
 
 # Hàm chọn nhân vật của người chơi 1
 def select_fighter_1():
@@ -215,6 +187,49 @@ def select_fighter_1():
                 elif event.key == pygame.K_4:
                     selected_fighter_1 = 4  # Chọn nhân vật Lancer
                     selected = True
+
+def connect_to_client2():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind(('localhost', 5555))  # Đặt port bất kỳ, ví dụ: 5555
+    server_socket.listen(1)
+    print("Waiting for player 2 to connect...")
+    player2_socket, addr = server_socket.accept()
+    print("Player 2 connected!")
+    return player2_socket
+
+#kết nối với player1 
+player2_socket = connect_to_client2()
+
+select_fighter_1()
+
+# Hàm để gửi dữ liệu
+def send_data(received_socket):
+    while True:
+        move_data = fighter_1.move(SCREEN_WIDTH, SCREEN_HEIGHT, screen, fighter_2, round_over)
+        data = pickle.dumps((fighter_1.rect, fighter_1.action))
+        try:
+            received_socket.sendall(data)
+        except socket.error as e:
+            print(f"Socket error (send): {e}")
+            break
+
+# Hàm để nhận dữ liệu
+def receive_data(received_socket):
+    while True:
+        try:
+            data = received_socket.recv(1024)
+            if data:
+                # Nhận dữ liệu về vị trí và hành động của nhân vật đối phương
+                rect, action = pickle.loads(data)
+                # Cập nhật vị trí và hành động của nhân vật đối phương
+                fighter_2.rect = rect
+                fighter_2.action = action
+            else:
+                print("Connection closed by the other player.")
+                break
+        except socket.error as e:
+            print(f"Socket error (recv): {e}")
+            break
 
 # Chọn background
 def select_background():
@@ -250,23 +265,12 @@ def select_background():
                     pygame.display.update()
                 elif event.key == pygame.K_RETURN:
                     selected = True
+    player2_socket.send(str(selected_background).encode())
     return selected_background
 
-select_fighter_1()
-
-
-while True:
-    data = client_socket.recv(1024)
-    if data == b'select_fighter_and_bg':
-        break
-# Hiển thị giao diện để chọn nhân vật và background
-selected_fighter = select_fighter_1()
 # Chọn background và nhân vật của người chơi 1 và người chơi 2
 selected_background = select_background()
 bg_image = bg_images[selected_background]
-# Gửi thông tin về lựa chọn cho menu.py
-client_socket.sendall(pickle.dumps(selected_fighter))
-client_socket.sendall(pickle.dumps(selected_background))
 
 # Tạo nhân vật cho người chơi 1
 if selected_fighter_1 == 1:
@@ -277,7 +281,11 @@ elif selected_fighter_1 == 3:
     fighter_1 = Fighter(1, 200, 310, False, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, sword_fx)
 elif selected_fighter_1 == 4:
     fighter_1 = Fighter(1, 200, 310, False, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, sword_fx)
+#gửi nhân vật cho người chơi 1
+player2_socket.send(str(selected_fighter_1).encode())
 
+# nhân nhân vật từ người chơi 2 
+selected_fighter_2 = int(player2_socket.recv(1024).decode())
 # Tạo nhân vật cho người chơi 2
 if selected_fighter_2 == 1:
     fighter_2 = Fighter(2, 700, 310, True, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
@@ -289,16 +297,16 @@ elif selected_fighter_2 == 4:
     fighter_2 = Fighter(2, 700, 310, True, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, sword_fx)
 
 
-# Tạo luồng cho việc gửi và nhận dữ liệu
-send_thread = threading.Thread(target=send_data, args=(received_socket,))
-receive_thread = threading.Thread(target=receive_data, args=(received_socket,))
+# # Tạo luồng cho việc gửi và nhận dữ liệu
+# send_thread = threading.Thread(target=send_data, args=(received_socket,))
+# receive_thread = threading.Thread(target=receive_data, args=(received_socket,))
 
-# Khởi chạy luồng
-send_thread.start()
-receive_thread.start()
+# # Khởi chạy luồng
+# send_thread.start()
+# receive_thread.start()
 
-# Đóng kết nối
-client_socket.close()
+# # Đóng kết nối
+# client_socket.close()
 
 # Game loop
 try:
@@ -318,9 +326,12 @@ try:
         # Cập nhật countdown
         if intro_count <= 0:
             time_remaining -= 1 / FPS
-
-            send_data(received_socket)
-            receive_data(received_socket)
+            send_thread = threading.Thread(target=send_data, args=(received_socket,))
+            receive_thread = threading.Thread(target=receive_data, args=(received_socket,))
+            # Khởi chạy luồng
+            send_thread.start()
+            receive_thread.start()
+            # fighter_2.move(SCREEN_WIDTH, SCREEN_HEIGHT, None, fighter_1, round_over)
  
         else:
             # Hiển thị đồng hồ đếm
@@ -362,6 +373,10 @@ try:
                     intro_count = 3
                     time_remaining = 60
 
+                    # # Dừng các luồng
+                    # send_thread.join()
+                    # receive_thread.join()
+
                     # Khởi tạo lại nhân vật
                     if selected_fighter_1 == 1:
                         fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
@@ -380,6 +395,14 @@ try:
                         fighter_2 = Fighter(2, 700, 310, True, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, sword_fx)
                     elif selected_fighter_2 == 4:
                         fighter_2 = Fighter(2, 700, 310, True, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, sword_fx)
+
+                    # # Khởi tạo lại luồng
+                    # send_thread = threading.Thread(target=send_data, args=(received_socket,))
+                    # receive_thread = threading.Thread(target=receive_data, args=(received_socket,))
+
+                    # # Khởi chạy luồng
+                    # send_thread.start()
+                    # receive_thread.start()
 
         # Kiểm tra người chơi thua
         if round_over == False:
@@ -404,6 +427,11 @@ try:
                 round_over = False
                 intro_count = 3
                 time_remaining = 60
+
+                # # Dừng các luồng
+                # send_thread.join()
+                # receive_thread.join()
+                # Khởi tạo lại nhân vật
             
                 if selected_fighter_1 == 1:
                     fighter_1 = Fighter(1, 200, 310, False, WARRIOR_DATA, warrior_sheet, WARRIOR_ANIMATION_STEPS, sword_fx)
@@ -422,6 +450,14 @@ try:
                     fighter_2 = Fighter(2, 700, 310, True, SAMURAI_DATA, samurai_sheet, SAMURAI_ANIMATION_STEPS, sword_fx)
                 elif selected_fighter_2 == 4:
                     fighter_2 = Fighter(2, 700, 310, True, LANCER_DATA, lancer_sheet, LANCER_ANIMATION_STEPS, sword_fx)
+                
+                # # Khởi tạo lại luồng
+                # send_thread = threading.Thread(target=send_data, args=(received_socket,))
+                # receive_thread = threading.Thread(target=receive_data, args=(received_socket,))
+
+                # # Khởi chạy luồng
+                # send_thread.start()
+                # receive_thread.start()
 
         # Xử lý sự kiện
         for event in pygame.event.get():
@@ -435,8 +471,8 @@ try:
         # Cập nhật màn hình
         pygame.display.update()
 finally:
-    if client_socket:
-        client_socket.close()
+    if player2_socket:
+        player2_socket.close()
     send_thread.join()
     receive_thread.join()
     pygame.quit()
