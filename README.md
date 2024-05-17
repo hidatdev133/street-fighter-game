@@ -19,7 +19,7 @@ URL: [https://www.pygame.org/news ](https://www.pygame.org/news)
 1. Clone the git repo
 
 ```
-(https://github.com/hidatdev133/street-fighter-game)
+https://github.com/hidatdev133/street-fighter-game.git
 ```
 
 2. Open project folder
